@@ -1,8 +1,11 @@
+# relationship_app/query_samples.py
 
 from .models import Author, Book, Library, Librarian
 
 # Query all books by a specific author
-specific_author_books = Book.objects.filter(author__name='Specific Author')
+author_name = 'Author Name'
+specific_author = Author.objects.get(name=author_name)
+books_by_author = Book.objects.filter(author=specific_author)
 
 # List all books in a library
 library_name = 'Library Name'
