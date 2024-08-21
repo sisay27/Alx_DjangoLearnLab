@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView  # Add this line
-from .models import Library
+from .models import Book, Library
 
 def list_books(request):
     books = Book.objects.all()
