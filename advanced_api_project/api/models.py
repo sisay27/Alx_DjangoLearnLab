@@ -1,8 +1,9 @@
 from django.db import models
-class Author(models.Model):
-    name = models.CharField(max_length=100)
 
-    # Detailed comment explaining the Author model
-    # Purpose: Store information about authors.
-    # Fields:
-    # - name: The name of the author.
+class Author(models.Model):  
+    name = models.CharField(max_length=100)  
+
+class Book(models.Model):  
+    title = models.CharField(max_length=200)  
+    publication_year = models.IntegerField()  
+    author = models.ForeignKey(Author, related_name='books', on_delete=models.CASCADE)
