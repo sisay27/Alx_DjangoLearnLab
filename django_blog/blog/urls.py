@@ -26,4 +26,14 @@ urlpatterns = [
     path('post/<int:pk>/delete/', views.PostDeleteView.as_view(), name='post_delete'),
     path('post/<int:pk>/update/', views.PostUpdateView.as_view(), name='post_update'),
     path('post/new/', views.PostCreateView.as_view(), name='post_create'),
+    # Other existing URL patterns for your blog app
+    
+    # URL pattern for adding a new comment
+    path('posts/<int:post_id>/comments/new/', views.post_detail, name='add_comment'),
+
+    # URL pattern for editing a comment
+    path('comments/<int:comment_id>/edit/', views.comment_edit, name='edit_comment'),
+
+    # URL pattern for deleting a comment
+    path('comments/<int:comment_id>/delete/', views.comment_delete, name='delete_comment'),
 ]

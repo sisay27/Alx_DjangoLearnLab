@@ -1,0 +1,9 @@
+<!-- comments.html -->
+{% for comment in comments %}
+    <div class="comment">
+        <p><strong>{{ comment.author.username }}</strong> commented on {{ comment.created_at }}:</p>
+        <p>{{ comment.content }}</p>
+    </div>
+{% empty %}
+    <p>No comments yet.</p>
+{% endfor %}

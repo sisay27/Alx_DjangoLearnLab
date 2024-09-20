@@ -6,6 +6,11 @@ from django.views.generic.edit import DeleteView,CreateView,UpdateView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .models import Comment
+from .forms import CommentForm
 
 
 @login_required
@@ -60,3 +65,53 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         post = self.get_object()
         return self.request.user == post.author
+
+def post_detail(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    comments = Comment.objects.filter(post=post)
+
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.author = request.user
+            comment.save()
+            messages.success(request, 'Your comment has been posted!')
+            return redirect('post_detail', post_id=post_id)
+    else:
+        form = CommentForm()
+
+    return render(request, 'post_detail.html', {'post': post, 'comments': comments, 'form': form})
+
+@login_required
+def comment_edit(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    
+    if request.user == comment.author:
+        if request.method == 'POST':
+            form = CommentForm(request.POST, instance=comment)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Your comment has been updated!')
+                return redirect('post_detail', post_id=comment.post.id)
+        else:
+            form = CommentForm(instance=comment)
+        
+        return render(request, 'comment_edit.html', {'form': form})
+    else:
+        messages.error(request, 'You do not have permission to edit this comment.')
+        return redirect('post_detail', post_id=comment.post.id)
+
+@login_required
+def comment_delete(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    
+    if request.user == comment.author:
+        post_id = comment.post.id
+        comment.delete()
+        messages.success(request, 'Your comment has been deleted!')
+        return redirect('post_detail', post_id=post_id)
+    else:
+        messages.error(request, 'You do not have permission to delete this comment.')
+        return redirect('post_detail', post_id=comment.post.id)
