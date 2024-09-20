@@ -1,0 +1,19 @@
+<!-- post_list.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Blog Post List</title>
+</head>
+<body>
+    <h1>Blog Post List</h1>
+    <ul>
+        {% for post in posts %}
+            <li>
+                <h2>{{ post.title }}</h2>
+                <p>{{ post.content | truncatewords:30 }}</p>  <!-- Display a brief snippet of content -->
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
