@@ -1,0 +1,10 @@
+<h1>Welcome, {{ user.username }}</h1>
+<p>Email: {{ user.email }}</p>
+<!-- Include a form for editing profile details -->
+<form method="post">
+    {% csrf_token %}
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" value="{{ user.email }}">
+    <!-- Add fields for other profile information -->
+    <button type="submit">Update Profile</button>
+</form>
