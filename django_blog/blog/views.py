@@ -65,6 +65,33 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         post = self.get_object()
         return self.request.user == post.author
+    
+class CommentCreateView(LoginRequiredMixin, CreateView):
+    model = Comment
+    fields = ['content']
+    template_name = 'comment_form.html'
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        form.instance.post_id = self.kwargs['post_id']
+        return super().form_valid(form)
+
+class CommentUpdateView(LoginRequiredMixin, UpdateView):
+    model = Comment
+    fields = ['content']
+    template_name = 'comment_form.html'
+
+    def get_queryset(self):
+        return super().get_queryset().filter(author=self.request.user)
+
+class CommentDeleteView(LoginRequiredMixin, DeleteView):
+    model = Comment
+    success_url = reverse_lazy('home')
+
+    def get_queryset(self):
+        return super().get_queryset().filter(author=self.request.user)
+    
+
 
 def post_detail(request, post_id):
     post = get_object_or_404(Post, id=post_id)
@@ -115,3 +142,4 @@ def comment_delete(request, comment_id):
     else:
         messages.error(request, 'You do not have permission to delete this comment.')
         return redirect('post_detail', post_id=comment.post.id)
+    
