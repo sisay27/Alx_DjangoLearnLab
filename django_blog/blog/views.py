@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Comment
 from .forms import CommentForm
+from blog import models
 
 
 @login_required
@@ -143,3 +144,22 @@ def comment_delete(request, comment_id):
         messages.error(request, 'You do not have permission to delete this comment.')
         return redirect('post_detail', post_id=comment.post.id)
     
+from django.shortcuts import render
+from .models import Post
+
+def post_list(request):
+    query = request.GET.get('q')
+    posts = Post.objects.all()
+
+    if query:
+        posts = posts.filter(
+            models.Q(title__icontains=query) |
+            models.Q(tags__name__icontains=query) |
+            models.Q(content__icontains=query)
+        )
+
+    context = {
+        'posts': posts
+    }
+
+    return render(request, 'blog/post_list.html', context)
