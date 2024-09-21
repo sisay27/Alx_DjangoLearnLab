@@ -1,6 +1,7 @@
 from django import forms
 from .models import Post
 from .models import Comment
+from taggit.forms import TagWidget
 
 class PostForm(forms.ModelForm):
     class Meta:
@@ -34,3 +35,12 @@ class CommentForm(forms.ModelForm):
         if len(content) < 10:
             raise forms.ValidationError("Content must be at least 10 characters long.")
         return content
+    
+
+
+class PostForm(forms.ModelForm):
+    tags = forms.CharField(widget=TagWidget())
+
+    class Meta:
+        model = Post
+        fields = ['title', 'content', 'tags']
