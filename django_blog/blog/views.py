@@ -163,3 +163,21 @@ def post_list(request):
     }
 
     return render(request, 'blog/post_list.html', context)
+
+from django.shortcuts import render
+from .models import Post
+
+def post_list(request):
+    query = request.GET.get('q')
+    posts = Post.objects.all()
+
+    if query:
+        posts = Post.objects.filter(
+            title__icontains=query
+        )
+
+    context = {
+        'posts': posts
+    }
+
+    return render(request, 'blog/post_list.html', context)
