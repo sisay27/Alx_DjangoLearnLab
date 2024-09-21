@@ -47,3 +47,10 @@ urlpatterns = [
     path('post/<int:pk>/comments/new/', CommentCreateView.as_view(), name='new_comment'),
     path('comment/<int:pk>/delete/', CommentDeleteView.as_view(), name='delete_comment'),
 ]
+from .views import PostByTagListView
+
+urlpatterns = [
+    # Your existing URL patterns for the blog app
+
+    path('tags/<slug:tag_slug>/', PostByTagListView.as_view(), name='post_list_by_tag'),
+]
