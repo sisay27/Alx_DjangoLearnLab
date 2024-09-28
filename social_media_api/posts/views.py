@@ -9,7 +9,32 @@ from rest_framework.pagination import PageNumberPagination
 from .serializers import PostSerializer, CommentSerializer
 from rest_framework import generics
 from .serializers import PostSerializer
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .models import Post, Like
+from notifications.models import Notification
 
+@api_view(['POST'])
+def like_post(request, post_id):
+    post = Post.objects.get(id=post_id)
+    user = request.user
+
+    if Like.objects.filter(post=post, user=user).exists():
+        return Response({'message': 'You have already liked this post.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    like = Like(post=post, user=user)
+    like.save()
+
+    # Create a notification
+    Notification.objects.create(
+        recipient=post.author,
+        actor=user,
+        verb='liked your post',
+        target=post
+    )
+
+    return Response({'message': 'Post liked successfully.'}, status=status.HTTP_201_CREATED)
 class IsOwnerOrReadOnly(BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in ['GET', 'HEAD', 'OPTIONS']:
