@@ -8,6 +8,22 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from .models import CustomUser
 from .serializers import UserSerializer
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+from .models import CustomUser
+from .serializers import UserSerializer
+
+class UserListView(generics.ListAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        users = self.get_queryset()
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 User = get_user_model()  
