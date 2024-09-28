@@ -84,3 +84,35 @@ class FeedView(generics.ListAPIView):
         following_users = user.following.all()
         followed_posts = Post.objects.filter(author__in=following_users)
         return followed_posts.order_by('-created_at')
+    
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from django.shortcuts import get_object_or_404
+from .models import Post, Like
+from notifications.models import Notification
+
+@api_view(['POST'])
+def like_post(request, pk):
+    try:
+        post = Post.objects.get(pk=pk)
+    except Post.DoesNotExist:
+        return Response({'message': 'Post not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    user = request.user
+
+    if Like.objects.filter(post=post, user=user).exists():
+        return Response({'message': 'You have already liked this post.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    like = Like(post=post, user=user)
+    like.save()
+
+    # Create a notification
+    Notification.objects.create(
+        recipient=post.author,
+        actor=user,
+        verb='liked your post',
+        target=post
+    )
+
+    return Response({'message': 'Post liked successfully.'}, status=status.HTTP_201_CREATED)
