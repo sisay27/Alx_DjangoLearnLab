@@ -4,16 +4,22 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response  
 from .serializers import UserRegisterSerializer, UserSerializer, TokenSerializer  
 from django.contrib.auth import get_user_model  
-from rest_framework import status
 from rest_framework.decorators import api_view
-from .models import CustomUser
 from .serializers import UserSerializer
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 from rest_framework import status
 from .models import CustomUser
-from .serializers import UserSerializer
+
+class UserDetailView(generics.RetrieveAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
 
 class UserListView(generics.ListAPIView):
     queryset = CustomUser.objects.all()
