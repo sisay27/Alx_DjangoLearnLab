@@ -4,6 +4,8 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model  
 from django.contrib.auth.models import User  
 from rest_framework.authtoken.models import Token  
+from .models import CustomUser
+
 
 class UserRegisterSerializer(serializers.ModelSerializer):  
     # Define fields, including CharField for username and password  
@@ -57,3 +59,12 @@ class UserDetailSerializer(serializers.ModelSerializer):
         instance.profile_picture = validated_data.get('profile_picture', instance.profile_picture)  
         instance.save()  
         return instance
+
+
+class CustomUserSerializer(serializers.ModelSerializer):
+    # Add serializers.CharField() field example
+    example_field = serializers.CharField(max_length=100)
+
+    class Meta:
+        model = CustomUser
+        fields = ['id', 'username', 'email', 'example_field']  # Include 'example_field' in the fields attribute
